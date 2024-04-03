@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	availableTypes = []ResourceType{kinesisType, lambdaType, sqsType}
+	availableTypes = []string{kinesisType, lambdaType, sqsType}
 )
 
 func TestFindDifferences(t *testing.T) {
@@ -25,8 +25,8 @@ func TestFindDifferences(t *testing.T) {
 	tests := []struct {
 		name                       string
 		args                       args
-		wantAddedResourcesByType   map[ResourceType][]Resource
-		wantRemovedResourcesByType map[ResourceType][]Resource
+		wantAddedResourcesByType   map[string][]Resource
+		wantRemovedResourcesByType map[string][]Resource
 		wantAddedRelationships     []Relationship
 		wantRemovedRelationships   []Relationship
 	}{
@@ -46,11 +46,11 @@ func TestFindDifferences(t *testing.T) {
 					},
 				},
 			},
-			wantAddedResourcesByType: map[ResourceType][]Resource{
+			wantAddedResourcesByType: map[string][]Resource{
 				lambdaType: {lambda2Resource},
 				sqsType:    {sqs2Resource},
 			},
-			wantRemovedResourcesByType: map[ResourceType][]Resource{
+			wantRemovedResourcesByType: map[string][]Resource{
 				lambdaType: {lambda1Resource},
 				sqsType:    {sqs1Resource},
 			},
@@ -67,8 +67,8 @@ func TestFindDifferences(t *testing.T) {
 				rc1: &ResourceCollection{},
 				rc2: &ResourceCollection{},
 			},
-			wantAddedResourcesByType:   map[ResourceType][]Resource{},
-			wantRemovedResourcesByType: map[ResourceType][]Resource{},
+			wantAddedResourcesByType:   map[string][]Resource{},
+			wantRemovedResourcesByType: map[string][]Resource{},
 			wantAddedRelationships:     nil,
 			wantRemovedRelationships:   nil,
 		},

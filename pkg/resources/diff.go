@@ -9,7 +9,7 @@ import (
 // FindDifferences finds the differences between two resource collections.
 func FindDifferences(
 	rc1, rc2 *ResourceCollection,
-) (addedResourcesByType, removedResourcesByType map[ResourceType][]Resource,
+) (addedResourcesByType, removedResourcesByType map[string][]Resource,
 	addedRelationships, removedRelationships []Relationship,
 ) {
 	// Find added and removed resources.
@@ -23,7 +23,7 @@ func FindDifferences(
 		rc2Resources[res.Value()] = struct{}{}
 	}
 
-	removedResourcesByType = map[ResourceType][]Resource{}
+	removedResourcesByType = map[string][]Resource{}
 
 	for _, res := range rc1.Resources {
 		if _, exists := rc2Resources[res.Value()]; !exists {
@@ -31,7 +31,7 @@ func FindDifferences(
 		}
 	}
 
-	addedResourcesByType = map[ResourceType][]Resource{}
+	addedResourcesByType = map[string][]Resource{}
 
 	for _, res := range rc2.Resources {
 		if _, exists := rc1Resources[res.Value()]; !exists {
@@ -56,7 +56,7 @@ func FindDifferences(
 }
 
 // PrintDiff prints the differences between two resource collections.
-func PrintDiff(rc1, rc2 *ResourceCollection, availableTypes []ResourceType) {
+func PrintDiff(rc1, rc2 *ResourceCollection, availableTypes []string) {
 	addedResourcesByType, removedResourcesByType, addedRelationships, removedRelationships := FindDifferences(rc1, rc2)
 
 	for _, k := range availableTypes {

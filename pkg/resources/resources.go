@@ -1,14 +1,11 @@
 package resources
 
-// ResourceType represents the type of a resource.
-type ResourceType string
-
 // Resource defines the basic contract for all resource types, specifying methods to retrieve the ID, value, and
 // resource type of a resource.
 type Resource interface {
 	ID() string
 	Value() string
-	ResourceType() ResourceType
+	ResourceType() string
 }
 
 // GenericResource represents a generic implementation of a resource, providing methods to retrieve the ID, value, and
@@ -16,15 +13,15 @@ type Resource interface {
 type GenericResource struct {
 	id           string
 	value        string
-	resourceType ResourceType
+	resourceType string
 }
 
-func NewGenericResource(id, value string, resourceType ResourceType) *GenericResource {
+func NewGenericResource(id, value string, resourceType string) *GenericResource {
 	return &GenericResource{id: id, value: value, resourceType: resourceType}
 }
-func (r *GenericResource) ID() string                 { return r.id }
-func (r *GenericResource) Value() string              { return r.value }
-func (r *GenericResource) ResourceType() ResourceType { return r.resourceType }
+func (r *GenericResource) ID() string           { return r.id }
+func (r *GenericResource) Value() string        { return r.value }
+func (r *GenericResource) ResourceType() string { return r.resourceType }
 
 // Relationship represents the relationship between two resources. It consists of a source and a target resource.
 type Relationship struct {

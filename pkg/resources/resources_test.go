@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	kinesisType ResourceType = "kinesis"
-	lambdaType  ResourceType = "lambda"
-	sqsType     ResourceType = "sqs"
+	kinesisType = "kinesis"
+	lambdaType  = "lambda"
+	sqsType     = "sqs"
 )
 
 func TestResourceCollection_AddResource(t *testing.T) {
