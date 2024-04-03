@@ -23,7 +23,7 @@ spotting differences between sets.
 ## How to Use
 
 ```bash
-$ go get https://github.com/diagram-code-generator/resources@latest
+$ go get github.com/diagram-code-generator/resources@latest
 ```
 
 ## Core Components
