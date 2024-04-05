@@ -4,7 +4,9 @@ go 1.21.6
 
 require (
 	github.com/fatih/color v1.16.0
+	github.com/joselitofilho/drawio-parser-go v0.1.0
 	github.com/stretchr/testify v1.9.0
+	go.uber.org/mock v0.4.0
 )
 
 require (
