@@ -116,7 +116,7 @@ func TestTransform(t *testing.T) {
 				tc.setup(tc.args.factory.(*resources.MockResourceFactory))
 			}
 
-			got, err := Transform(tc.args.mxFile, tc.args.factory)
+			got, err := NewTransformer(tc.args.mxFile, tc.args.factory).Transform()
 
 			require.ErrorIs(t, err, tc.targetErr)
 			require.Equal(t, tc.want, got)

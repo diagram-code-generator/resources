@@ -10,18 +10,27 @@ import (
 
 var ErrInvalidXML = errors.New("invalid XML error")
 
+type Transformer struct {
+	mxFile  *drawioxml.MxFile
+	factory resources.ResourceFactory
+}
+
+func NewTransformer(mxFile *drawioxml.MxFile, factory resources.ResourceFactory) *Transformer {
+	return &Transformer{mxFile: mxFile, factory: factory}
+}
+
 // Transform parses resources from the MxFile.
-func Transform(mxFile *drawioxml.MxFile, factory resources.ResourceFactory) (*resources.ResourceCollection, error) {
-	if mxFile == nil {
+func (t *Transformer) Transform() (*resources.ResourceCollection, error) {
+	if t.mxFile == nil {
 		return nil, ErrInvalidXML
 	}
 
 	resc := resources.NewResourceCollection()
 
-	for i := range mxFile.Diagram.MxGraphModel.Root.MxCells {
-		cell := mxFile.Diagram.MxGraphModel.Root.MxCells[i]
+	for i := range t.mxFile.Diagram.MxGraphModel.Root.MxCells {
+		cell := t.mxFile.Diagram.MxGraphModel.Root.MxCells[i]
 
-		resource := factory.CreateResource(cell.ID, cell.Value, cell.Style)
+		resource := t.factory.CreateResource(cell.ID, cell.Value, cell.Style)
 		if resource != nil {
 			resc.AddResource(resource)
 		}
@@ -32,8 +41,8 @@ func Transform(mxFile *drawioxml.MxFile, factory resources.ResourceFactory) (*re
 		resourcesMap[resource.ID()] = resource
 	}
 
-	for i := range mxFile.Diagram.MxGraphModel.Root.MxCells {
-		cell := mxFile.Diagram.MxGraphModel.Root.MxCells[i]
+	for i := range t.mxFile.Diagram.MxGraphModel.Root.MxCells {
+		cell := t.mxFile.Diagram.MxGraphModel.Root.MxCells[i]
 		if cell.Source != "" && cell.Target != "" {
 			source := resourcesMap[cell.Source]
 			target := resourcesMap[cell.Target]
