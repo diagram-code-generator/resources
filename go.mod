@@ -3,6 +3,7 @@ module github.com/diagram-code-generator/resources
 go 1.21.6
 
 require (
+	github.com/emicklei/dot v1.6.1
 	github.com/fatih/color v1.16.0
 	github.com/joselitofilho/drawio-parser-go v0.1.0
 	github.com/stretchr/testify v1.9.0
