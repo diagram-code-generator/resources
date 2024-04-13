@@ -12,6 +12,8 @@ import (
 var (
 	//go:embed testdata/happy_path.dot
 	happyPath []byte
+	//go:embed testdata/custom_node_edge_attrs.dot
+	customNodeEdgeAttrs []byte
 	//go:embed testdata/lr_orientation.dot
 	lrOrientation []byte
 	//go:embed testdata/source_or_target_nil.dot
@@ -38,6 +40,18 @@ func TestBuild(t *testing.T) {
 		"sqs":    "images/sqs.svg",
 	}
 
+	nodeAttrs := make(map[string]any)
+	for k, v := range DefaultNodeAttrs {
+		nodeAttrs[k] = v
+	}
+	delete(nodeAttrs, "height")
+
+	edgeAttrs := make(map[string]any)
+	for k, v := range DefaultEdgeAttrs {
+		edgeAttrs[k] = v
+	}
+	edgeAttrs["arrowtail"] = "dot"
+
 	tests := []struct {
 		name string
 		args args
@@ -57,6 +71,21 @@ func TestBuild(t *testing.T) {
 				config:           Config{},
 			},
 			want: string(happyPath),
+		},
+		{
+			name: "custom node and edge attrs",
+			args: args{
+				resc: &resources.ResourceCollection{
+					Resources: []resources.Resource{lambdaResource, sqsResource},
+					Relationships: []resources.Relationship{{
+						Source: lambdaResource,
+						Target: sqsResource,
+					}},
+				},
+				resourceImageMap: reourceImageMap,
+				config:           Config{NodeAttrs: nodeAttrs, EdgeAttrs: edgeAttrs},
+			},
+			want: string(customNodeEdgeAttrs),
 		},
 		{
 			name: "left-right orientation",

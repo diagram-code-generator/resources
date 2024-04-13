@@ -8,8 +8,24 @@ import (
 
 const OrientationLeftRight = "LR"
 
+var (
+	DefaultNodeAttrs = map[string]any{
+		"shape":    "plaintext",
+		"imagepos": "tc",
+		"labelloc": "b",
+		"height":   0.9,
+	}
+
+	DefaultEdgeAttrs = map[string]any{
+		"arrowhead": "vee",
+		"arrowtail": "normal",
+	}
+)
+
 type Config struct {
 	Orientation string
+	NodeAttrs   map[string]any
+	EdgeAttrs   map[string]any
 }
 
 func Build(
@@ -28,11 +44,27 @@ func BuildWithStyle(
 	}
 
 	g.NodeInitializer(func(n dot.Node) {
-		n.Attrs("shape", "plaintext", "imagepos", "tc", "labelloc", "b", "height", "0.9")
+		var nodeAttrs map[string]any = DefaultNodeAttrs
+
+		if len(config.NodeAttrs) > 0 {
+			nodeAttrs = config.NodeAttrs
+		}
+
+		for name, value := range nodeAttrs {
+			n.Attrs(name, value)
+		}
 	})
 
 	g.EdgeInitializer(func(e dot.Edge) {
-		e.Attrs("arrowhead", "vee", "arrowtail", "normal")
+		var edgeAttrs map[string]any = DefaultEdgeAttrs
+
+		if len(config.EdgeAttrs) > 0 {
+			edgeAttrs = config.EdgeAttrs
+		}
+
+		for name, value := range edgeAttrs {
+			e.Attrs(name, value)
+		}
 	})
 
 	nodes := map[string]dot.Node{}
