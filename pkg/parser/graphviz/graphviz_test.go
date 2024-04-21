@@ -29,7 +29,7 @@ func TestBuild(t *testing.T) {
 	type args struct {
 		resc             *resources.ResourceCollection
 		resourceImageMap map[string]string
-		config           Config
+		config           *Config
 	}
 
 	lambdaResource := resources.NewGenericResource("1", "MyLambda", "lambda")
@@ -68,7 +68,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           Config{},
+				config:           &Config{},
 			},
 			want: string(happyPath),
 		},
@@ -83,7 +83,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           Config{NodeAttrs: nodeAttrs, EdgeAttrs: edgeAttrs},
+				config:           &Config{NodeAttrs: nodeAttrs, EdgeAttrs: edgeAttrs},
 			},
 			want: string(customNodeEdgeAttrs),
 		},
@@ -98,7 +98,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           Config{Orientation: "LR"},
+				config:           &Config{Orientation: "LR"},
 			},
 			want: string(lrOrientation),
 		},
@@ -107,7 +107,7 @@ func TestBuild(t *testing.T) {
 			args: args{
 				resc:             resources.NewResourceCollection(),
 				resourceImageMap: map[string]string{},
-				config:           Config{},
+				config:           &Config{},
 			},
 			want: "digraph  {\n\t\n\t\n}\n",
 		},
@@ -122,7 +122,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           Config{},
+				config:           &Config{},
 			},
 			want: string(sourceOrTargetNil),
 		},
@@ -137,7 +137,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           Config{},
+				config:           &Config{},
 			},
 			want: string(sourceOrTargetNil),
 		},
@@ -158,8 +158,7 @@ func TestBuildWithStyle(t *testing.T) {
 	type args struct {
 		resc             *resources.ResourceCollection
 		resourceImageMap map[string]string
-		config           Config
-		style            Style
+		config           *Config
 	}
 
 	lambdaResource := resources.NewGenericResource("1", "MyLambda", "lambda")
@@ -198,12 +197,13 @@ func TestBuildWithStyle(t *testing.T) {
 					},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           Config{},
-				style: Style{
-					Nodes: map[resources.Resource]string{lambdaResource: "green"},
-					Arrows: map[string][]map[string]string{
-						"MyLambda": {{"my-queue": "red"}, {"MyStream": "green"}},
-						"MyStream": {{"MyLambda": "green"}},
+				config: &Config{
+					Style: &Style{
+						Nodes: map[resources.Resource]string{lambdaResource: "green"},
+						Arrows: map[string][]map[string]string{
+							"MyLambda": {{"my-queue": "red"}, {"MyStream": "green"}},
+							"MyStream": {{"MyLambda": "green"}},
+						},
 					},
 				},
 			},
@@ -234,12 +234,13 @@ func TestBuildWithStyle(t *testing.T) {
 					},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           Config{},
-				style: Style{
-					Nodes: map[resources.Resource]string{lambdaResource: "green"},
-					Arrows: map[string][]map[string]string{
-						"MyLambda": {{"my-queue": "red"}, {"MyStream": "green"}},
-						"MyStream": {{"MyLambda": "green"}},
+				config: &Config{
+					Style: &Style{
+						Nodes: map[resources.Resource]string{lambdaResource: "green"},
+						Arrows: map[string][]map[string]string{
+							"MyLambda": {{"my-queue": "red"}, {"MyStream": "green"}},
+							"MyStream": {{"MyLambda": "green"}},
+						},
 					},
 				},
 			},
@@ -251,7 +252,7 @@ func TestBuildWithStyle(t *testing.T) {
 		tc := tests[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			got := BuildWithStyle(tc.args.resc, tc.args.resourceImageMap, tc.args.config, tc.args.style)
+			got := Build(tc.args.resc, tc.args.resourceImageMap, tc.args.config)
 
 			require.Equal(t, tc.want, got)
 		})

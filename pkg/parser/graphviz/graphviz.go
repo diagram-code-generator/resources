@@ -22,21 +22,7 @@ var (
 	}
 )
 
-type Config struct {
-	Orientation string
-	NodeAttrs   map[string]any
-	EdgeAttrs   map[string]any
-}
-
-func Build(
-	resc *resources.ResourceCollection, resourceImageMap map[string]string, config Config,
-) string {
-	return BuildWithStyle(resc, resourceImageMap, config, Style{})
-}
-
-func BuildWithStyle(
-	resc *resources.ResourceCollection, resourceImageMap map[string]string, config Config, style Style,
-) string {
+func Build(resc *resources.ResourceCollection, resourceImageMap map[string]string, config *Config) string {
 	g := dot.NewGraph(dot.Directed)
 
 	if config.Orientation != "" {
@@ -70,6 +56,11 @@ func BuildWithStyle(
 	nodes := map[string]dot.Node{}
 	edges := map[string]struct{}{}
 
+	style := config.Style
+	if style == nil {
+		style = &Style{}
+	}
+
 	applyStyleForNodes(resc, g, resourceImageMap, nodes, style)
 
 	applyStyleForArrows(resc, edges, g, nodes, style)
@@ -78,8 +69,9 @@ func BuildWithStyle(
 }
 
 func applyStyleForNodes(
-	resc *resources.ResourceCollection, g *dot.Graph, resourceImageMap map[string]string,
-	nodes map[string]dot.Node, style Style) {
+	resc *resources.ResourceCollection, g *dot.Graph, resourceImageMap map[string]string, nodes map[string]dot.Node,
+	style *Style,
+) {
 	for i := range resc.Resources {
 		res := resc.Resources[i]
 
@@ -100,7 +92,9 @@ func applyStyleForNodes(
 }
 
 func applyStyleForArrows(
-	resc *resources.ResourceCollection, edges map[string]struct{}, g *dot.Graph, nodes map[string]dot.Node, style Style,
+	resc *resources.ResourceCollection,
+	edges map[string]struct{}, g *dot.Graph, nodes map[string]dot.Node,
+	style *Style,
 ) {
 	for _, rel := range resc.Relationships {
 		if rel.Source == nil || rel.Target == nil {
@@ -127,7 +121,7 @@ func applyStyleForArrows(
 	applyCustomArrowStyles(style, edges, g, nodes)
 }
 
-func applyCustomArrowStyles(style Style, edges map[string]struct{}, g *dot.Graph, nodes map[string]dot.Node) {
+func applyCustomArrowStyles(style *Style, edges map[string]struct{}, g *dot.Graph, nodes map[string]dot.Node) {
 	for source, targets := range style.Arrows {
 		for i := range targets {
 			for target, color := range targets[i] {
@@ -143,7 +137,7 @@ func applyCustomArrowStyles(style Style, edges map[string]struct{}, g *dot.Graph
 	}
 }
 
-func getArrowColor(style Style, rel resources.Relationship) (string, bool) {
+func getArrowColor(style *Style, rel resources.Relationship) (string, bool) {
 	if list, exists := style.Arrows[rel.Source.Value()]; exists {
 		for _, colors := range list {
 			if color, ok := colors[rel.Target.Value()]; ok {
