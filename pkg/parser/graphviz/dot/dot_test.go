@@ -1,4 +1,4 @@
-package graphviz
+package dot
 
 import (
 	_ "embed"
@@ -27,9 +27,8 @@ var (
 
 func TestBuild(t *testing.T) {
 	type args struct {
-		resc             *resources.ResourceCollection
-		resourceImageMap map[string]string
-		config           *DotConfig
+		resc   *resources.ResourceCollection
+		config *Config
 	}
 
 	lambdaResource := resources.NewGenericResource("1", "MyLambda", "lambda")
@@ -67,8 +66,7 @@ func TestBuild(t *testing.T) {
 						Target: sqsResource,
 					}},
 				},
-				resourceImageMap: reourceImageMap,
-				config:           &DotConfig{},
+				config: &Config{ResourceImageMap: reourceImageMap},
 			},
 			want: string(happyPath),
 		},
@@ -82,8 +80,7 @@ func TestBuild(t *testing.T) {
 						Target: sqsResource,
 					}},
 				},
-				resourceImageMap: reourceImageMap,
-				config:           &DotConfig{NodeAttrs: nodeAttrs, EdgeAttrs: edgeAttrs},
+				config: &Config{NodeAttrs: nodeAttrs, EdgeAttrs: edgeAttrs, ResourceImageMap: reourceImageMap},
 			},
 			want: string(customNodeEdgeAttrs),
 		},
@@ -97,17 +94,15 @@ func TestBuild(t *testing.T) {
 						Target: sqsResource,
 					}},
 				},
-				resourceImageMap: reourceImageMap,
-				config:           &DotConfig{Orientation: "LR"},
+				config: &Config{Orientation: "LR", ResourceImageMap: reourceImageMap},
 			},
 			want: string(lrOrientation),
 		},
 		{
 			name: "empty graph",
 			args: args{
-				resc:             resources.NewResourceCollection(),
-				resourceImageMap: map[string]string{},
-				config:           &DotConfig{},
+				resc:   resources.NewResourceCollection(),
+				config: &Config{ResourceImageMap: map[string]string{}},
 			},
 			want: "digraph  {\n\t\n\t\n}\n",
 		},
@@ -121,8 +116,7 @@ func TestBuild(t *testing.T) {
 						Target: sqsResource,
 					}},
 				},
-				resourceImageMap: reourceImageMap,
-				config:           &DotConfig{},
+				config: &Config{ResourceImageMap: reourceImageMap},
 			},
 			want: string(sourceOrTargetNil),
 		},
@@ -136,8 +130,7 @@ func TestBuild(t *testing.T) {
 						Target: nil,
 					}},
 				},
-				resourceImageMap: reourceImageMap,
-				config:           &DotConfig{},
+				config: &Config{ResourceImageMap: reourceImageMap},
 			},
 			want: string(sourceOrTargetNil),
 		},
@@ -147,7 +140,7 @@ func TestBuild(t *testing.T) {
 		tc := tests[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			got := Build(tc.args.resc, tc.args.resourceImageMap, tc.args.config)
+			got := Build(tc.args.resc, tc.args.config)
 
 			require.Equal(t, tc.want, got)
 		})
@@ -156,9 +149,8 @@ func TestBuild(t *testing.T) {
 
 func TestBuildWithStyle(t *testing.T) {
 	type args struct {
-		resc             *resources.ResourceCollection
-		resourceImageMap map[string]string
-		config           *DotConfig
+		resc   *resources.ResourceCollection
+		config *Config
 	}
 
 	lambdaResource := resources.NewGenericResource("1", "MyLambda", "lambda")
@@ -196,8 +188,7 @@ func TestBuildWithStyle(t *testing.T) {
 						},
 					},
 				},
-				resourceImageMap: reourceImageMap,
-				config: &DotConfig{
+				config: &Config{
 					Style: &Style{
 						Nodes: map[resources.Resource]string{lambdaResource: "green"},
 						Arrows: map[string][]map[string]string{
@@ -205,6 +196,7 @@ func TestBuildWithStyle(t *testing.T) {
 							"MyStream": {{"MyLambda": "green"}},
 						},
 					},
+					ResourceImageMap: reourceImageMap,
 				},
 			},
 			want: string(withStyleHappyPath),
@@ -233,8 +225,7 @@ func TestBuildWithStyle(t *testing.T) {
 						},
 					},
 				},
-				resourceImageMap: reourceImageMap,
-				config: &DotConfig{
+				config: &Config{
 					Style: &Style{
 						Nodes: map[resources.Resource]string{lambdaResource: "green"},
 						Arrows: map[string][]map[string]string{
@@ -242,6 +233,7 @@ func TestBuildWithStyle(t *testing.T) {
 							"MyStream": {{"MyLambda": "green"}},
 						},
 					},
+					ResourceImageMap: reourceImageMap,
 				},
 			},
 			want: string(withStyleHappyPath),
@@ -252,7 +244,7 @@ func TestBuildWithStyle(t *testing.T) {
 		tc := tests[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			got := Build(tc.args.resc, tc.args.resourceImageMap, tc.args.config)
+			got := Build(tc.args.resc, tc.args.config)
 
 			require.Equal(t, tc.want, got)
 		})

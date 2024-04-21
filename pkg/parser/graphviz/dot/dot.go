@@ -1,4 +1,4 @@
-package graphviz
+package dot
 
 import (
 	"github.com/emicklei/dot"
@@ -22,7 +22,7 @@ var (
 	}
 )
 
-func Build(resc *resources.ResourceCollection, resourceImageMap map[string]string, config *DotConfig) string {
+func Build(resc *resources.ResourceCollection, config *Config) string {
 	g := dot.NewGraph(dot.Directed)
 
 	if config.Orientation != "" {
@@ -61,7 +61,7 @@ func Build(resc *resources.ResourceCollection, resourceImageMap map[string]strin
 		style = &Style{}
 	}
 
-	applyStyleForNodes(resc, g, resourceImageMap, nodes, style)
+	applyStyleForNodes(resc, g, config.ResourceImageMap, nodes, style)
 
 	applyStyleForArrows(resc, edges, g, nodes, style)
 
