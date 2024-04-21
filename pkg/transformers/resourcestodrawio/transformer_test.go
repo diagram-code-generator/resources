@@ -5,11 +5,13 @@ import (
 	"errors"
 	"testing"
 
+	drawioxml "github.com/joselitofilho/drawio-parser-go/pkg/parser/xml"
+
+	gdrawioxml "github.com/diagram-code-generator/resources/pkg/parser/graphviz/drawioxml"
 	"github.com/diagram-code-generator/resources/pkg/resources"
+
 	"github.com/goccy/go-graphviz"
 	"github.com/stretchr/testify/require"
-
-	drawioxml "github.com/joselitofilho/drawio-parser-go/pkg/parser/xml"
 )
 
 func TestTransformer_Transform(t *testing.T) {
@@ -19,7 +21,7 @@ func TestTransformer_Transform(t *testing.T) {
 	errDummy := errors.New("dummy error")
 
 	type fields struct {
-		config        *Config
+		config        *gdrawioxml.Config
 		resCollection *resources.ResourceCollection
 		g             *graphviz.Graphviz
 	}
@@ -37,8 +39,8 @@ func TestTransformer_Transform(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				config: &Config{
-					Styles: map[string]string{"lambda": lambdaStyle},
+				config: &gdrawioxml.Config{
+					NodeStyles: map[string]string{"lambda": lambdaStyle},
 				},
 				resCollection: &resources.ResourceCollection{
 					Resources: []resources.Resource{lambda1, lambda2, lambda3},
@@ -49,13 +51,13 @@ func TestTransformer_Transform(t *testing.T) {
 				g: graphviz.New(),
 			},
 			setup: func() (tearDown func()) {
-				randRead = func(b []byte) (n int, err error) {
+				gdrawioxml.RandRead = func(b []byte) (n int, err error) {
 					require.Len(t, b, 15)
 					return 15, nil
 				}
 
 				return func() {
-					randRead = rand.Read
+					gdrawioxml.RandRead = rand.Read
 				}
 			},
 			want: &drawioxml.MxFile{Diagram: drawioxml.Diagram{MxGraphModel: drawioxml.MxGraphModel{
@@ -91,7 +93,7 @@ func TestTransformer_Transform(t *testing.T) {
 		{
 			name: "when randRead fails should return an empty base ID",
 			fields: fields{
-				config: &Config{},
+				config: &gdrawioxml.Config{},
 				resCollection: &resources.ResourceCollection{
 					Resources: []resources.Resource{lambda1, lambda2, lambda3},
 					Relationships: []resources.Relationship{
@@ -101,13 +103,13 @@ func TestTransformer_Transform(t *testing.T) {
 				g: graphviz.New(),
 			},
 			setup: func() (tearDown func()) {
-				randRead = func(b []byte) (n int, err error) {
+				gdrawioxml.RandRead = func(b []byte) (n int, err error) {
 					require.Len(t, b, 15)
 					return 15, errDummy
 				}
 
 				return func() {
-					randRead = rand.Read
+					gdrawioxml.RandRead = rand.Read
 				}
 			},
 			want: &drawioxml.MxFile{Diagram: drawioxml.Diagram{MxGraphModel: drawioxml.MxGraphModel{
@@ -147,7 +149,7 @@ func TestTransformer_Transform(t *testing.T) {
 			tearDown := tt.setup()
 			defer tearDown()
 
-			tr := NewTransformer(tt.fields.config, tt.fields.resCollection, tt.fields.g)
+			tr := NewTransformer(tt.fields.resCollection, tt.fields.config, tt.fields.g)
 
 			got := tr.Transform()
 

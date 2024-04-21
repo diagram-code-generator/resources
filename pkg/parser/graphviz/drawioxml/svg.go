@@ -1,4 +1,4 @@
-package resourcestodrawio
+package drawioxml
 
 import "encoding/xml"
 
