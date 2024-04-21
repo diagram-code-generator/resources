@@ -29,7 +29,7 @@ func TestBuild(t *testing.T) {
 	type args struct {
 		resc             *resources.ResourceCollection
 		resourceImageMap map[string]string
-		config           *Config
+		config           *DotConfig
 	}
 
 	lambdaResource := resources.NewGenericResource("1", "MyLambda", "lambda")
@@ -68,7 +68,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           &Config{},
+				config:           &DotConfig{},
 			},
 			want: string(happyPath),
 		},
@@ -83,7 +83,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           &Config{NodeAttrs: nodeAttrs, EdgeAttrs: edgeAttrs},
+				config:           &DotConfig{NodeAttrs: nodeAttrs, EdgeAttrs: edgeAttrs},
 			},
 			want: string(customNodeEdgeAttrs),
 		},
@@ -98,7 +98,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           &Config{Orientation: "LR"},
+				config:           &DotConfig{Orientation: "LR"},
 			},
 			want: string(lrOrientation),
 		},
@@ -107,7 +107,7 @@ func TestBuild(t *testing.T) {
 			args: args{
 				resc:             resources.NewResourceCollection(),
 				resourceImageMap: map[string]string{},
-				config:           &Config{},
+				config:           &DotConfig{},
 			},
 			want: "digraph  {\n\t\n\t\n}\n",
 		},
@@ -122,7 +122,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           &Config{},
+				config:           &DotConfig{},
 			},
 			want: string(sourceOrTargetNil),
 		},
@@ -137,7 +137,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 				resourceImageMap: reourceImageMap,
-				config:           &Config{},
+				config:           &DotConfig{},
 			},
 			want: string(sourceOrTargetNil),
 		},
@@ -158,7 +158,7 @@ func TestBuildWithStyle(t *testing.T) {
 	type args struct {
 		resc             *resources.ResourceCollection
 		resourceImageMap map[string]string
-		config           *Config
+		config           *DotConfig
 	}
 
 	lambdaResource := resources.NewGenericResource("1", "MyLambda", "lambda")
@@ -197,7 +197,7 @@ func TestBuildWithStyle(t *testing.T) {
 					},
 				},
 				resourceImageMap: reourceImageMap,
-				config: &Config{
+				config: &DotConfig{
 					Style: &Style{
 						Nodes: map[resources.Resource]string{lambdaResource: "green"},
 						Arrows: map[string][]map[string]string{
@@ -234,7 +234,7 @@ func TestBuildWithStyle(t *testing.T) {
 					},
 				},
 				resourceImageMap: reourceImageMap,
-				config: &Config{
+				config: &DotConfig{
 					Style: &Style{
 						Nodes: map[resources.Resource]string{lambdaResource: "green"},
 						Arrows: map[string][]map[string]string{

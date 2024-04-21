@@ -22,7 +22,7 @@ var (
 	}
 )
 
-func Build(resc *resources.ResourceCollection, resourceImageMap map[string]string, config *Config) string {
+func Build(resc *resources.ResourceCollection, resourceImageMap map[string]string, config *DotConfig) string {
 	g := dot.NewGraph(dot.Directed)
 
 	if config.Orientation != "" {
