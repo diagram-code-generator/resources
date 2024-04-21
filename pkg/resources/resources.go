@@ -16,6 +16,7 @@ type GenericResource struct {
 	resourceType string
 }
 
+// NewGenericResource creates a new instance of GenericResource.
 func NewGenericResource(id, value string, resourceType string) *GenericResource {
 	return &GenericResource{id: id, value: value, resourceType: resourceType}
 }

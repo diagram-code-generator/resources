@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/diagram-code-generator/resources/pkg/resources"
+	"github.com/diagram-code-generator/resources/pkg/resources/mocks"
 	drawioxml "github.com/joselitofilho/drawio-parser-go/pkg/parser/xml"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
@@ -24,7 +25,7 @@ func TestTransform(t *testing.T) {
 	tests := []struct {
 		name      string
 		args      args
-		setup     func(*resources.MockResourceFactory)
+		setup     func(*mocks.MockResourceFactory)
 		want      *resources.ResourceCollection
 		targetErr error
 	}{
@@ -44,9 +45,9 @@ func TestTransform(t *testing.T) {
 						},
 					},
 				},
-				factory: resources.NewMockResourceFactory(ctrl),
+				factory: mocks.NewMockResourceFactory(ctrl),
 			},
-			setup: func(mrf *resources.MockResourceFactory) {
+			setup: func(mrf *mocks.MockResourceFactory) {
 				mrf.EXPECT().
 					CreateResource("APPENGINE_ID", "appengine", "mx-appengine").
 					Return(appEngineResource)
@@ -77,9 +78,9 @@ func TestTransform(t *testing.T) {
 						},
 					},
 				},
-				factory: resources.NewMockResourceFactory(ctrl),
+				factory: mocks.NewMockResourceFactory(ctrl),
 			},
-			setup: func(mrf *resources.MockResourceFactory) {
+			setup: func(mrf *mocks.MockResourceFactory) {
 				gomock.InOrder(
 					mrf.EXPECT().
 						CreateResource("APPENGINE_ID", "appengine", "mx-appengine").
@@ -101,7 +102,7 @@ func TestTransform(t *testing.T) {
 			name: "when XML is invalid should return an error",
 			args: args{
 				mxFile:  nil,
-				factory: &resources.MockResourceFactory{},
+				factory: &mocks.MockResourceFactory{},
 			},
 			want:      nil,
 			targetErr: ErrInvalidXML,
@@ -113,7 +114,7 @@ func TestTransform(t *testing.T) {
 
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.setup != nil {
-				tc.setup(tc.args.factory.(*resources.MockResourceFactory))
+				tc.setup(tc.args.factory.(*mocks.MockResourceFactory))
 			}
 
 			got, err := NewTransformer(tc.args.mxFile, tc.args.factory).Transform()

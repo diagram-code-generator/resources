@@ -1,4 +1,4 @@
-//go:generate mockgen -package resources -destination resource_factory_mock.go -source resource_factory.go
+//go:generate mockgen -package mocks -source resource_factory.go -destination mocks/resource_factory_mock.go
 package resources
 
 type ResourceFactory interface {
