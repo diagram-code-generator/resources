@@ -36,13 +36,12 @@ func NewDotDiagram(config *Config) *DotDiagram {
 
 func (d *DotDiagram) Build(resc *resources.ResourceCollection) string {
 	if d.config == nil {
-		d.config = &Config{}
+		d.config = defaultConfig()
 	}
-	config := d.config
 
-	if config.Orientation != "" {
-		d.g.Attr("rankdir", config.Orientation)
-	}
+	d.applyStyleForDiagram()
+
+	config := d.config
 
 	d.g.NodeInitializer(func(n dot.Node) {
 		var nodeAttrs map[string]any = DefaultNodeAttrs
@@ -76,6 +75,16 @@ func (d *DotDiagram) Build(resc *resources.ResourceCollection) string {
 	d.applyStyleForArrows(resc, edges, nodes)
 
 	return d.g.String()
+}
+
+func (d *DotDiagram) applyStyleForDiagram() {
+	if d.config.Orientation != "" {
+		d.g.Attr("rankdir", d.config.Orientation)
+	}
+
+	if d.config.Splines != "" {
+		d.g.Attr("splines", string(d.config.Splines))
+	}
 }
 
 func (d *DotDiagram) applyStyleForNodes(resc *resources.ResourceCollection, nodes map[string]dot.Node) {
@@ -151,6 +160,12 @@ func (d *DotDiagram) applyCustomArrowStyles(style *Style, edges map[string]struc
 				}
 			}
 		}
+	}
+}
+
+func defaultConfig() *Config {
+	return &Config{
+		Splines: DefaultSpline,
 	}
 }
 

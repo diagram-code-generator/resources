@@ -9,6 +9,7 @@ type Style struct {
 
 type Config struct {
 	Orientation      string
+	Splines          DiagramSpline
 	NodeAttrs        map[string]any
 	EdgeAttrs        map[string]any
 	ResourceImageMap map[string]string

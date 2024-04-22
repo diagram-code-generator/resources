@@ -15,7 +15,7 @@ var (
 	//go:embed testdata/custom_node_edge_attrs.dot
 	customNodeEdgeAttrs []byte
 	//go:embed testdata/default_config.dot
-	defaultConfig []byte
+	defaultConfigDot []byte
 	//go:embed testdata/lr_orientation.dot
 	lrOrientation []byte
 	//go:embed testdata/source_or_target_nil.dot
@@ -67,7 +67,7 @@ func TestBuild(t *testing.T) {
 		{
 			name: "happy path",
 			fields: fields{
-				config: &Config{ResourceImageMap: reourceImageMap},
+				config: &Config{Splines: SplineOrtho, ResourceImageMap: reourceImageMap},
 			},
 			args: args{
 				resc: &resources.ResourceCollection{
@@ -242,7 +242,7 @@ func TestBuild(t *testing.T) {
 					}},
 				},
 			},
-			want: string(defaultConfig),
+			want: string(defaultConfigDot),
 		},
 	}
 
