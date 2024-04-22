@@ -22,14 +22,29 @@ var (
 	}
 )
 
-func Build(resc *resources.ResourceCollection, config *Config) string {
-	g := dot.NewGraph(dot.Directed)
+type DotDiagram struct {
+	config *Config
+	g      *dot.Graph
+}
+
+func NewDotDiagram(config *Config) *DotDiagram {
+	return &DotDiagram{
+		config: config,
+		g:      dot.NewGraph(dot.Directed),
+	}
+}
+
+func (d *DotDiagram) Build(resc *resources.ResourceCollection) string {
+	if d.config == nil {
+		d.config = &Config{}
+	}
+	config := d.config
 
 	if config.Orientation != "" {
-		g.Attr("rankdir", config.Orientation)
+		d.g.Attr("rankdir", config.Orientation)
 	}
 
-	g.NodeInitializer(func(n dot.Node) {
+	d.g.NodeInitializer(func(n dot.Node) {
 		var nodeAttrs map[string]any = DefaultNodeAttrs
 
 		if len(config.NodeAttrs) > 0 {
@@ -41,7 +56,7 @@ func Build(resc *resources.ResourceCollection, config *Config) string {
 		}
 	})
 
-	g.EdgeInitializer(func(e dot.Edge) {
+	d.g.EdgeInitializer(func(e dot.Edge) {
 		var edgeAttrs map[string]any = DefaultEdgeAttrs
 
 		if len(config.EdgeAttrs) > 0 {
@@ -56,26 +71,25 @@ func Build(resc *resources.ResourceCollection, config *Config) string {
 	nodes := map[string]dot.Node{}
 	edges := map[string]struct{}{}
 
-	style := config.Style
+	d.applyStyleForNodes(resc, nodes)
+
+	d.applyStyleForArrows(resc, edges, nodes)
+
+	return d.g.String()
+}
+
+func (d *DotDiagram) applyStyleForNodes(resc *resources.ResourceCollection, nodes map[string]dot.Node) {
+	style := d.config.Style
 	if style == nil {
 		style = &Style{}
 	}
 
-	applyStyleForNodes(resc, g, config.ResourceImageMap, nodes, style)
+	resourceImageMap := d.config.ResourceImageMap
 
-	applyStyleForArrows(resc, edges, g, nodes, style)
-
-	return g.String()
-}
-
-func applyStyleForNodes(
-	resc *resources.ResourceCollection, g *dot.Graph, resourceImageMap map[string]string, nodes map[string]dot.Node,
-	style *Style,
-) {
 	for i := range resc.Resources {
 		res := resc.Resources[i]
 
-		node := g.Node(res.Value()).Attr("image", resourceImageMap[res.ResourceType()])
+		node := d.g.Node(res.Value()).Attr("image", resourceImageMap[res.ResourceType()])
 
 		if color, ok := style.Nodes[res]; ok {
 			node = node.Attr("fontcolor", color)
@@ -85,17 +99,20 @@ func applyStyleForNodes(
 	}
 
 	for k, v := range style.Nodes {
-		nodes[k.Value()] = g.Node(k.Value()).
+		nodes[k.Value()] = d.g.Node(k.Value()).
 			Attr("fontcolor", v).
 			Attr("image", resourceImageMap[k.ResourceType()])
 	}
 }
 
-func applyStyleForArrows(
-	resc *resources.ResourceCollection,
-	edges map[string]struct{}, g *dot.Graph, nodes map[string]dot.Node,
-	style *Style,
+func (d *DotDiagram) applyStyleForArrows(
+	resc *resources.ResourceCollection, edges map[string]struct{}, nodes map[string]dot.Node,
 ) {
+	style := d.config.Style
+	if style == nil {
+		style = &Style{}
+	}
+
 	for _, rel := range resc.Relationships {
 		if rel.Source == nil || rel.Target == nil {
 			continue
@@ -110,25 +127,25 @@ func applyStyleForArrows(
 		targetNode := nodes[rel.Target.Value()]
 
 		if color, ok := getArrowColor(style, rel); ok {
-			g.Edge(sourceNode, targetNode).Attr("color", color)
+			d.g.Edge(sourceNode, targetNode).Attr("color", color)
 		} else {
-			g.Edge(sourceNode, targetNode)
+			d.g.Edge(sourceNode, targetNode)
 		}
 
 		edges[edgeKey] = struct{}{}
 	}
 
-	applyCustomArrowStyles(style, edges, g, nodes)
+	d.applyCustomArrowStyles(style, edges, nodes)
 }
 
-func applyCustomArrowStyles(style *Style, edges map[string]struct{}, g *dot.Graph, nodes map[string]dot.Node) {
+func (d *DotDiagram) applyCustomArrowStyles(style *Style, edges map[string]struct{}, nodes map[string]dot.Node) {
 	for source, targets := range style.Arrows {
 		for i := range targets {
 			for target, color := range targets[i] {
 				edgeKey := source + "###" + target
 
 				if _, ok := edges[edgeKey]; !ok {
-					g.Edge(nodes[source], nodes[target]).Attr("color", color)
+					d.g.Edge(nodes[source], nodes[target]).Attr("color", color)
 
 					edges[edgeKey] = struct{}{}
 				}
