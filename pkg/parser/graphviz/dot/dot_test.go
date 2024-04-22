@@ -173,7 +173,7 @@ func TestBuild(t *testing.T) {
 		{
 			name: "left-right orientation",
 			fields: fields{
-				config: &Config{Orientation: "LR", ResourceImageMap: reourceImageMap},
+				config: &Config{Direction: "LR", ResourceImageMap: reourceImageMap},
 			},
 			args: args{
 				resc: &resources.ResourceCollection{

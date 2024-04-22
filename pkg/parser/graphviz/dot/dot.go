@@ -6,8 +6,6 @@ import (
 	"github.com/diagram-code-generator/resources/pkg/resources"
 )
 
-const OrientationLeftRight = "LR"
-
 var (
 	DefaultNodeAttrs = map[string]any{
 		"shape":    "plaintext",
@@ -78,8 +76,8 @@ func (d *DotDiagram) Build(resc *resources.ResourceCollection) string {
 }
 
 func (d *DotDiagram) applyStyleForDiagram() {
-	if d.config.Orientation != "" {
-		d.g.Attr("rankdir", d.config.Orientation)
+	if d.config.Direction != "" {
+		d.g.Attr("rankdir", d.config.Direction)
 	}
 
 	if d.config.Splines != "" {
@@ -165,7 +163,8 @@ func (d *DotDiagram) applyCustomArrowStyles(style *Style, edges map[string]struc
 
 func defaultConfig() *Config {
 	return &Config{
-		Splines: DefaultSpline,
+		Direction: DefaultDirection,
+		Splines:   DefaultSpline,
 	}
 }
 
