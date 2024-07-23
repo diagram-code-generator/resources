@@ -1,7 +1,7 @@
 digraph  {
 	rankdir="TB";
-	n1[height="0.9",image="",imagepos="tc",label="MyLambda",labelloc="b",shape="plaintext"];
-	n2[height="0.9",image="",imagepos="tc",label="my-queue",labelloc="b",shape="plaintext"];
+	n1[height="0.9",imagepos="tc",label="MyLambda",labelloc="b",shape="plaintext"];
+	n2[height="0.9",imagepos="tc",label="my-queue",labelloc="b",shape="plaintext"];
 	n1->n2[arrowhead="vee",arrowtail="normal"];
 	
 }

@@ -95,8 +95,13 @@ func (d *DotDiagram) applyStyleForNodes(resc *resources.ResourceCollection, node
 
 	for i := range resc.Resources {
 		res := resc.Resources[i]
+		node := d.g.Node(res.Value())
 
-		node := d.g.Node(res.Value()).Attr("image", resourceImageMap[res.ResourceType()])
+		if resourceImageMap != nil {
+			if image, ok := resourceImageMap[res.ResourceType()]; ok {
+				node = node.Attr("image", image)
+			}
+		}
 
 		if color, ok := style.Nodes[res]; ok {
 			node = node.Attr("fontcolor", color)
@@ -106,9 +111,13 @@ func (d *DotDiagram) applyStyleForNodes(resc *resources.ResourceCollection, node
 	}
 
 	for k, v := range style.Nodes {
-		nodes[k.Value()] = d.g.Node(k.Value()).
-			Attr("fontcolor", v).
-			Attr("image", resourceImageMap[k.ResourceType()])
+		nodes[k.Value()] = d.g.Node(k.Value()).Attr("fontcolor", v)
+
+		if resourceImageMap != nil {
+			if image, ok := resourceImageMap[k.ResourceType()]; ok {
+				nodes[k.Value()] = nodes[k.Value()].Attr("image", image)
+			}
+		}
 	}
 }
 
